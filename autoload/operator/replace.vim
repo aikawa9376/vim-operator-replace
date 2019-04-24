@@ -48,6 +48,33 @@ endfunction
 
 
 
+" Interface  "{{{1
+function! operator#replace#do_r(motion_wise)  "{{{2
+  let visual_command = s:visual_command_from_wise_name(a:motion_wise)
+
+  let put_command = (s:deletion_moves_the_cursor_p(
+  \                    a:motion_wise,
+  \                    getpos("']")[1:2],
+  \                    len(getline("']")),
+  \                    [line('$'), len(getline('$'))]
+  \                  )
+  \                  ? 'p'
+  \                  : 'P')
+
+  if !s:is_empty_region(getpos("'["), getpos("']"))
+    let original_selection = &g:selection
+    let &g:selection = 'inclusive'
+    execute 'normal!' '`['.visual_command.'`]" d'
+    let &g:selection = original_selection
+  end
+  execute 'normal!' '"'.operator#user#register().put_command
+  return
+endfunction
+
+
+
+
+
 
 
 

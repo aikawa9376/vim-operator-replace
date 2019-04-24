@@ -30,6 +30,7 @@ endif
 
 
 call operator#user#define('replace', 'operator#replace#do')
+call operator#user#define('replace_r', 'operator#replace#do_r')
 
 
 
