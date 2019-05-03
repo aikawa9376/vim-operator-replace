@@ -44,10 +44,6 @@ function! operator#replace#do(motion_wise)  "{{{2
   return
 endfunction
 
-
-
-
-
 " Interface  "{{{1
 function! operator#replace#do_r(motion_wise)  "{{{2
   let visual_command = s:visual_command_from_wise_name(a:motion_wise)
@@ -71,12 +67,32 @@ function! operator#replace#do_r(motion_wise)  "{{{2
   return
 endfunction
 
+" Interface  "{{{1
+" original depend mr
+function! operator#replace#do_R(motion_wise)  "{{{2
+  let visual_command = s:visual_command_from_wise_name(a:motion_wise)
 
+  let put_command = (s:deletion_moves_the_cursor_p(
+  \                    a:motion_wise,
+  \                    getpos("']")[1:2],
+  \                    len(getline("']")),
+  \                    [line('$'), len(getline('$'))]
+  \                  )
+  \                  ? 'p'
+  \                  : 'P')
 
-
-
-
-
+  if !s:is_empty_region(getpos("'["), getpos("']"))
+    let original_selection = &g:selection
+    let &g:selection = 'inclusive'
+    execute 'normal!' '`['.visual_command.'`]" d'
+    let &g:selection = original_selection
+  end
+  execute 'normal!' '"'.operator#user#register().put_command
+  execute "normal! \'r"
+  let repl = substitute(getline("."), getreg('0'), getreg('"'), 'g')
+  call setline(".", repl)
+  return
+endfunction
 
 " Misc.  "{{{1
 " s:deletion_moves_the_cursor_p(motion_wise)  "{{{2
@@ -101,13 +117,6 @@ function! s:deletion_moves_the_cursor_p(motion_wise,
   endif
 endfunction
 
-
-
-
-
-
-
-
 function! s:is_empty_region(begin, end)  "{{{2
   " Whenever 'operatorfunc' is called, '[ is always placed before '] even if
   " a backward motion is given to g@.  But there is the only one exception.
@@ -115,9 +124,6 @@ function! s:is_empty_region(begin, end)  "{{{2
   " '[ is placed after '].
   return a:begin[1] == a:end[1] && a:end[2] < a:begin[2]
 endfunction
-
-
-
 
 function! s:visual_command_from_wise_name(wise_name)  "{{{2()
   if a:wise_name ==# 'char'
@@ -131,13 +137,6 @@ function! s:visual_command_from_wise_name(wise_name)  "{{{2()
     return 'v'  " fallback
   endif
 endfunction
-
-
-
-
-
-
-
 
 " __END__  "{{{1
 " vim: foldmethod=marker

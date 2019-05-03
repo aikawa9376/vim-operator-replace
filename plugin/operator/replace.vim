@@ -26,14 +26,9 @@ if exists('g:loaded_operator_replace')
   finish
 endif
 
-
-
-
 call operator#user#define('replace', 'operator#replace#do')
 call operator#user#define('replace_r', 'operator#replace#do_r')
-
-
-
+call operator#user#define('replace_R', 'operator#replace#do_R')
 
 let g:loaded_operator_replace = 1
 
